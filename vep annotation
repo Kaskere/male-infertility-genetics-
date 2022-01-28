@@ -1,0 +1,27 @@
+#!/bin/bash -x
+
+#PBS -N vep
+#PBS -q batch
+#PBS -l walltime=72:00:00
+#PBS -l nodes=1:ppn=8
+#PBS -l feature=largescratch
+#PBS -j oe
+####PBS -A
+#PBS -o rsu
+module load bio/vep/101-sg
+export inpath=/mnt/home/groups/rsu/alksere_b/iecat/rawvcf_normalised
+export outpath=/mnt/home/groups/rsu/alksere_b/azoo/vep_raw_normalised
+export cache=/mnt/beegfs2/home/baiba01/cache
+mkdir -p $outpath
+chmod u+rwx $outpath
+for file in $inpath/*.vcf ;
+do
+        sample=$(basename $file ".vcf")
+        echo $sample
+        outfile=$outpath/$sample"_vep.vcf"
+        singularity exec $vep \
+        #vep --database \
+        # --dir_cache $cache \
+        vep  -i $file -o $outfile
+        --fork 8 \
+done
